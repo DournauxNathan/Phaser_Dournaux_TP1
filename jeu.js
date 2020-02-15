@@ -196,7 +196,7 @@ function hitPlatforms(bomb, platforms) {
 
 	if(speedBomb >= 150)
 	{
-		bomb.destroy(true);
+		bomb.destroy(true); 
 		speedBomb = 0;
 	}
 }
