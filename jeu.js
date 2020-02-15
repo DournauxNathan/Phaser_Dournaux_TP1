@@ -34,6 +34,7 @@ var speedBomb = 1;
 function preload() {
 	this.load.image('background','assets/back.png');	
 	this.load.spritesheet('rupee','assets/rupee.png', {frameWidth: 16, frameHeight: 16});
+	this.load.spritesheet('cherry','assets/cherry.png', {frameWidth: 16, frameHeight: 16});
 	this.load.image('sol','assets/platform.png');
 
 	
@@ -102,10 +103,12 @@ function create() {
 	cursors = this.input.keyboard.createCursorKeys(); 
 	
 	/*Colllectible*/
+		//Rupees
 	rupees = this.physics.add.group({
 		key: 'rupee',
-		repeat:11,
-		setXY: {x:12,y:0,stepX:70},
+		repeat: 4,
+		setXY: {x:50,y:0,stepX:150},
+		setScale: { x: 1.5, y: 1.5}
 	});
 
 	this.anims.create({
@@ -114,9 +117,17 @@ function create() {
 		frameRate: 2,
 		repeat: -1
 	})
-	
 	this.physics.add.collider(rupees,platforms);
 	this.physics.add.overlap(player,rupees,collectRupee,null,this);
+
+	cherrys = this.physics.add.group({
+		key: 'cherry',
+		setXY: {x:700,y:500},
+		setScale: { x: 1.5, y: 1.5}
+	});
+
+	this.physics.add.collider(cherrys, platforms);
+	this.physics.add.overlap(player, cherrys, collectCherrys, null, this);
 
 	/*Texte*/
 		//Score
@@ -185,33 +196,35 @@ function update() {
 		player.anims.play('idle', true);
 	} 
 
+		
 	if(nVies == 2)
 	{
 		vie3.destroy(true);
 	}
-	else if(nVies == 1)
+	if(nVies == 1)
 	{
 		vie2.destroy(true);
 	}
-	else if(nVies == 0) 
+	if(nVies == 0) 
 	{
 		vie1.destroy();
+		
 		this.physics.pause();
 	    player.setTint(0xff0000);
 	   	gameOverText.visible = true;
 	   	newGameText.visible = true;
 	   	gameOver = true;
 	}
-}
+	
 
+}
 
 function hitBomb(player, bomb) {
 	bomb.disableBody(true, true);
 	nVies--;
 	bomb.destroy(true);
+	console.log(nVies);
 }
-
-
 
 function collectRupee(player, rupee) {
 	rupee.disableBody(true,true);
@@ -219,23 +232,76 @@ function collectRupee(player, rupee) {
 
 	scoreText.setText('' + score);
 
-		if (rupees.countActive(true) === 0)
-	    {
-	        rupees.children.iterate(function (child) {
+	if (rupees.countActive(true) === 0)
+    {
+        rupees.children.iterate(function (child) {
+            child.enableBody(true, child.x, 0, true, true);
+        });
+
+        var x = (player.x < 400) ? 
+        	Phaser.Math.Between(400, 800) : 
+        	Phaser.Math.Between(0, 400);
+
+        var bomb = bombs.create(x, 16, 'bomb');
+
+        bomb.setBounce(1);
+        bomb.setCollideWorldBounds(true);
+        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        bomb.allowGravity = false;
+    }
+}
+
+function collectCherrys(player, cherry) {
+	if (nVies === 3) 
+	{
+		cherry.disableBody(true,true);
+		score += 10;
+		scoreText.setText('' + score);
+
+		if (cherrys.countActive(true) === 0)
+   		{
+	    	cherrys.children.iterate(function (child) {
 	            child.enableBody(true, child.x, 0, true, true);
 	        });
 
-	        var x = (player.x < 400) ? 
-	        	Phaser.Math.Between(400, 800) : 
-	        	Phaser.Math.Between(0, 400);
+	    	var x = (player.x < 400) ? 
+        	Phaser.Math.Between(400, 800) : 
+        	Phaser.Math.Between(0, 400);
 
-	        var bomb = bombs.create(x, 16, 'bomb');
+	        cherrys.setXY(Phaser.Math.Between(x, x), Phaser.Math.Between(30, 550));
+	       
+		}
+	}
 
-	        bomb.setBounce(1);
-	        bomb.setCollideWorldBounds(true);
-	        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-	        bomb.allowGravity = false;
-	    }
+	if(nVies < 3)
+	{
+		cherry.disableBody(true,true);
+		nVies++;
+		console.log(nVies);
+
+		if (cherrys.countActive(true) === 0)
+   		{
+	    	cherrys.children.iterate(function (child) {
+	            child.enableBody(true, child.x, 0, true, true);
+	        });
+
+	    	var x = (player.x < 400) ? 
+        	Phaser.Math.Between(400, 800) : 
+        	Phaser.Math.Between(0, 400);
+
+	        cherrys.setXY(Phaser.Math.Between(x, x), Phaser.Math.Between(30, 550));
+
+		}
+
+		if (nVies == 2) {
+			vie2 = this.add.image(60,30,'2vie');
+		}
+
+		if (nVies == 3) {
+			vie3 = this.add.image(60,30,'3vie');
+		}
+
+	}
 }
 
 function hitPlatforms(bomb, platforms) {
