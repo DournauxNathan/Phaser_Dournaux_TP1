@@ -106,8 +106,8 @@ function create() {
 		//Rupees
 	rupees = this.physics.add.group({
 		key: 'rupee',
-		repeat: 1,
-		setXY: {x:0,y:500,stepX:60},
+		repeat: 4,
+		setXY: {x:50,y:0,stepX:150},
 		setScale: { x: 1.5, y: 1.5}
 	});
 
@@ -122,8 +122,7 @@ function create() {
 
 	cherrys = this.physics.add.group({
 		key: 'cherry',
-		repeat: 0,
-		setXY: {x:500,y:0},
+		setXY: {x:700,y:500},
 		setScale: { x: 1.5, y: 1.5}
 	});
 
@@ -264,6 +263,13 @@ function collectCherrys(player, cherry) {
 	    	cherrys.children.iterate(function (child) {
 	            child.enableBody(true, child.x, 0, true, true);
 	        });
+
+	    	var x = (player.x < 400) ? 
+        	Phaser.Math.Between(400, 800) : 
+        	Phaser.Math.Between(0, 400);
+
+	        cherrys.setXY(Phaser.Math.Between(x, x), Phaser.Math.Between(30, 550));
+	       
 		}
 	}
 
@@ -278,6 +284,13 @@ function collectCherrys(player, cherry) {
 	    	cherrys.children.iterate(function (child) {
 	            child.enableBody(true, child.x, 0, true, true);
 	        });
+
+	    	var x = (player.x < 400) ? 
+        	Phaser.Math.Between(400, 800) : 
+        	Phaser.Math.Between(0, 400);
+
+	        cherrys.setXY(Phaser.Math.Between(x, x), Phaser.Math.Between(30, 550));
+
 		}
 
 		if (nVies == 2) {
