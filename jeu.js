@@ -21,6 +21,7 @@ var game = new Phaser.Game(config);
 var score = 0;
 var platforms;
 var player;
+var nVies = 3;
 var jump = 2;
 var nJump = 1;
 var cursors; 
@@ -41,6 +42,11 @@ function preload() {
 	this.load.spritesheet('perso','assets/idle.png',{frameWidth: 32, frameHeight: 32});
 	this.load.spritesheet('run','assets/run.png',{frameWidth: 32, frameHeight: 32});
 	this.load.spritesheet('saut','assets/jump.png',{frameWidth: 32, frameHeight: 32});
+
+	this.load.image('3vie', 'assets/vie/3vie.png');
+	this.load.image('2vie', 'assets/vie/2vie.png');
+	this.load.image('1vie', 'assets/vie/1vie.png');
+	this.load.image('0vie', 'assets/vie/0vie.png');
 }
 
 
@@ -65,6 +71,11 @@ function create() {
 	player = this.physics.add.sprite(100,450,'idle').setScale(2);
 	player.setCollideWorldBounds(true);
 	this.physics.add.collider(player,platforms);
+
+	vie3 = this.add.image(60,30,'3vie');
+	vie2 = this.add.image(60,30,'2vie');
+	vie1 = this.add.image(60,30,'1vie');
+	vie0 = this.add.image(60,30,'0vie');
 	
 		//Animation
 	/*this.anims.create({
@@ -116,7 +127,7 @@ function create() {
 		//Bombes
 	bombs = this.physics.add.group();
 	this.physics.add.collider(bombs, platforms, hitPlatforms, null, this);
-	this.physics.add.collider(player, bombs, hitBomb, null, this);
+	this.physics.add.overlap(player, bombs, hitBomb, null, this);
 }
 
 
@@ -173,14 +184,30 @@ function update() {
 		player.setVelocityX(0);
 		player.anims.play('idle', true);
 	} 
+
+	if(nVies == 2)
+	{
+		vie3.destroy(true);
+	}
+	else if(nVies == 1)
+	{
+		vie2.destroy(true);
+	}
+	else if(nVies == 0) 
+	{
+		vie1.destroy();
+		this.physics.pause();
+	    player.setTint(0xff0000);
+	   	gameOverText.visible = true;
+	   	newGameText.visible = true;
+	   	gameOver = true;
+	}
 }
 
 
 function hitBomb(player, bomb) {
-	/*this.physics.pause();
-	player.setTint(0xff0000);
-	player.anims.play('turn');
-	gameOver=true;*/
+	bomb.disableBody(true, true);
+	nVies--;
 	bomb.destroy(true);
 }
 
