@@ -25,9 +25,10 @@ var cursors;
 var rupees;
 var scoreText;
 var bomb;
+var speedBomb = 1;
 
 
-function preload(){
+function preload() {
 	this.load.image('background','assets/back.png');	
 	this.load.spritesheet('rupee','assets/rupee.png', {frameWidth: 16, frameHeight: 16});
 	this.load.image('sol','assets/platform.png');
@@ -42,7 +43,7 @@ function preload(){
 
 
 
-function create(){
+function create() {
 
 	/*Fond du jeu*/
 	this.add.image(400,300,'background');
@@ -113,15 +114,12 @@ function create(){
 	/*Ennemi*/
 		//Bombes
 	bombs = this.physics.add.group();
-	this.physics.add.collider(bombs,platforms);
-	this.physics.add.collider(player,bombs, hitBomb, null, this);
-
-
+	this.physics.add.collider(bombs, platforms, hitPlatforms, null, this);
+	this.physics.add.collider(player, bombs, hitBomb, null, this);
 }
 
 
-
-function update(){
+function update() {
 	if(gameOver=false)
 	{
 		rupees.anims.play('turn', true);
@@ -156,14 +154,17 @@ function update(){
 }
 
 
-function hitBomb(player, bomb){
-	this.physics.pause();
+function hitBomb(player, bomb) {
+	/*this.physics.pause();
 	player.setTint(0xff0000);
 	player.anims.play('turn');
-	gameOver=true;
+	gameOver=true;*/
+	bomb.destroy(true);
 }
 
-function collectRupee(player, rupee){
+
+
+function collectRupee(player, rupee) {
 	rupee.disableBody(true,true);
 	score += 10;
 
@@ -185,6 +186,17 @@ function collectRupee(player, rupee){
 	        bomb.setCollideWorldBounds(true);
 	        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
 	        bomb.allowGravity = false;
-
 	    }
+}
+
+function hitPlatforms(bomb, platforms) {
+	speedBomb+= 10;
+	bomb.setGravityX(Phaser.Math.Between(-150+speedBomb, 150+speedBomb), 100+speedBomb);
+	console.log(speedBomb);
+
+	if(speedBomb >= 150)
+	{
+		bomb.destroy(true);
+		speedBomb = 0;
+	}
 }
