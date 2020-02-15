@@ -39,7 +39,7 @@ function preload() {
 	this.load.spritesheet('bomb','assets/bomb.png',{frameWidth: 32, frameHeight: 32});
 
 	this.load.spritesheet('perso','assets/idle.png',{frameWidth: 32, frameHeight: 32});
-	this.load.spritesheet('run','assets/run.png',{frameWidth: 33, frameHeight: 32});
+	this.load.spritesheet('run','assets/run.png',{frameWidth: 32, frameHeight: 32});
 	this.load.spritesheet('saut','assets/jump.png',{frameWidth: 32, frameHeight: 32});
 }
 
@@ -67,32 +67,25 @@ function create() {
 	this.physics.add.collider(player,platforms);
 	
 		//Animation
-	this.anims.create({
+	/*this.anims.create({
 		key:'jump',
-		frames: this.anims.generateFrameNumbers('saut', {rupeet: 0, end: 0}),
+		frames: this.anims.generateFrameNumbers('saut', {rupeet: 0, end: 3}),
 		frameRate: 2,
-	});
-
-	this.anims.create({
-		key:'sol',
-		frames: this.anims.generateFrameNumbers('saut', {rupeet: 1, end: 1}),
-		frameRate: 2,
-	});
+	});*/
 
 	this.anims.create({
 		key:'run',
 		frames: this.anims.generateFrameNumbers('run', {rupeet: 0, end: 5}),
-		frameRate: 10,
+		frameRate: 8,
 		repeat: -1
 	});
 	
 	this.anims.create({
 		key:'idle',
 		frames: this.anims.generateFrameNumbers('perso', {rupeet: 0, end: 3}),
-		frameRate: 10,
+		frameRate: 8,
 		repeat: -1
 	});
-
 
 	/*Creation des input directionnelles*/
 	cursors = this.input.keyboard.createCursorKeys(); 
@@ -128,52 +121,52 @@ function create() {
 
 
 function update() {
-/*	if(gameOver=false)
-	{
-		rupees.anims.play('turn', true);
-	}
-*/
 	/*Déplacement*/
 		//Saut
-		if ((player.body.touching.down) && (cursors.space.isDown))
+	if ((player.body.touching.down) && (cursors.space.isDown))
+	{
+		jump = 2;
+	}
+
+	if (cursors.space.isUp){
+		nJump = 1;
+	}
+
+	if ((nJump == 1) &&( jump > 0) && (cursors.space.isDown))
+	{
+		jump--;
+		nJump = 0;
+		if (jump == 1) 
 		{
-			jump = 2;
+			player.setVelocityY(-300);
 		}
 
-		if (cursors.space.isUp){
-			nJump = 1;
-		}
-
-		if ((nJump == 1) &&( jump > 0) && (cursors.space.isDown))
+		if (jump == 0) 
 		{
-			jump--;
-			nJump = 0;
-			if (jump == 1) 
-			{
-				player.setVelocityY(-300);
-			}
-
-			if (jump == 0) 
-			{
-				player.setVelocityY(-250);
-			}
+			player.setVelocityY(-250);
 		}
-	
-	 	
-	 	//player.anims.play('jump', true);
-	
+	}
+
 		//Droite et gauche
 	if(cursors.left.isDown)
 	{
 		player.setVelocityX(-200);
 		player.anims.play('run', true);
 		player.setFlipX(true);
+
+		if (cursors.shift.isDown) {
+			player.setVelocityX(-200*2);
+		}
 	}
 	else if(cursors.right.isDown)
 	{
 		player.setVelocityX(200);
 		player.anims.play('run', true);
 		player.setFlipX(false);
+
+		if (cursors.shift.isDown) {
+			player.setVelocityX(200*2);
+		}
 	}
 	else
 	{
