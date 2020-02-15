@@ -21,6 +21,8 @@ var game = new Phaser.Game(config);
 var score = 0;
 var platforms;
 var player;
+var jump = 2;
+var nJump = 1;
 var cursors; 
 var rupees;
 var scoreText;
@@ -38,7 +40,7 @@ function preload() {
 
 	this.load.spritesheet('perso','assets/idle.png',{frameWidth: 32, frameHeight: 32});
 	this.load.spritesheet('run','assets/run.png',{frameWidth: 33, frameHeight: 32});
-	this.load.spritesheet('jump','assets/jump.png',{frameWidth: 32, frameHeight: 32});
+	this.load.spritesheet('saut','assets/jump.png',{frameWidth: 32, frameHeight: 32});
 }
 
 
@@ -66,6 +68,18 @@ function create() {
 	
 		//Animation
 	this.anims.create({
+		key:'jump',
+		frames: this.anims.generateFrameNumbers('saut', {rupeet: 0, end: 0}),
+		frameRate: 2,
+	});
+
+	this.anims.create({
+		key:'sol',
+		frames: this.anims.generateFrameNumbers('saut', {rupeet: 1, end: 1}),
+		frameRate: 2,
+	});
+
+	this.anims.create({
 		key:'run',
 		frames: this.anims.generateFrameNumbers('run', {rupeet: 0, end: 5}),
 		frameRate: 10,
@@ -79,13 +93,7 @@ function create() {
 		repeat: -1
 	});
 
-	this.anims.create({
-		key:'jump',
-		frames: this.anims.generateFrameNumbers('jump', {rupeet: 0, end: 0}),
-		frameRate: 10,
-	});
 
-	
 	/*Creation des input directionnelles*/
 	cursors = this.input.keyboard.createCursorKeys(); 
 	
@@ -120,19 +128,40 @@ function create() {
 
 
 function update() {
-	if(gameOver=false)
+/*	if(gameOver=false)
 	{
 		rupees.anims.play('turn', true);
 	}
-
+*/
 	/*Déplacement*/
 		//Saut
-	if(cursors.up.isDown && player.body.touching.down)
-	{
-		player.setVelocityY(-400);
-		player.anims.play('jump', true);
+		if ((player.body.touching.down) && (cursors.space.isDown))
+		{
+			jump = 2;
+		}
 
-	}
+		if (cursors.space.isUp){
+			nJump = 1;
+		}
+
+		if ((nJump == 1) &&( jump > 0) && (cursors.space.isDown))
+		{
+			jump--;
+			nJump = 0;
+			if (jump == 1) 
+			{
+				player.setVelocityY(-300);
+			}
+
+			if (jump == 0) 
+			{
+				player.setVelocityY(-250);
+			}
+		}
+	
+	 	
+	 	//player.anims.play('jump', true);
+	
 		//Droite et gauche
 	if(cursors.left.isDown)
 	{
