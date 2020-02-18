@@ -24,16 +24,21 @@ var player;
 var nVies = 3;
 var jump = 2;
 var nJump = 1;
+
+var groupeBullets;
+var coefDir;
+
 var cursors; 
 var rupees;
 
 var score = 0;
 var scoreText;
+
 var gameOverText;
 var newGameText
+
 var bomb;
 var speedBomb = 1;
-
 var frog;
 var vieFrog = 1;
 
@@ -55,6 +60,7 @@ function preload() {
 	this.load.spritesheet('perso','assets/idle.png',{frameWidth: 32, frameHeight: 32});
 	this.load.spritesheet('run','assets/run.png',{frameWidth: 32, frameHeight: 32});
 	this.load.spritesheet('saut','assets/jump.png',{frameWidth: 32, frameHeight: 32});
+	this.load.image('bullet', 'assets/bullet.png');
 
 	this.load.image('3vie', 'assets/vie/3vie.png');
 	this.load.image('2vie', 'assets/vie/2vie.png');
@@ -88,6 +94,11 @@ function create() {
 	vie2 = this.add.image(60,30,'2vie');
 	vie1 = this.add.image(60,30,'1vie');
 	vie0 = this.add.image(60,30,'0vie');
+		//Projectiles
+	groupeBullets = this.physics.add.group();
+	this.physics.add.collider(groupeBullets,frog, hit, null,this);
+	//this.physics.add.overlap(bullet, frog, hit, null, this);
+        
 	
 		//Animation
 	this.anims.create({
@@ -109,7 +120,7 @@ function create() {
 		frameRate: 8,
 		repeat: -1
 	});
-
+		//
 	/*Creation des input directionnelles*/
 	cursors = this.input.keyboard.createCursorKeys(); 
 	keys = this.input.keyboard.addKeys('X'); 
@@ -252,6 +263,24 @@ function update() {
 		player.setVelocityX(0);
 		player.anims.play('idle', true);
 	} 
+
+	if (cursors.up.isDown) {
+	    if (player.direction == 'left') 
+	    { 
+	    	coefDir = 1; 
+	    } 
+	    /*if (player.direction == 'left')
+	    { 
+	    	coefDir = 1;
+	    }*/
+
+        //Création de la balle
+        var bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
+        //Parametres physiques de la balle
+        bullet.setCollideWorldBounds(true);
+        bullet.body.allowGravity =false;
+        bullet.setVelocity(1000 * coefDir, 0); 
+    }
 
 		
 	if(nVies == 2)
@@ -426,4 +455,8 @@ function hitPlatforms(bomb, platforms) {
 		bomb.destroy(true); 
 		speedBomb = 0;
 	}
+}
+
+function hit (groupeBullets, frog) {
+	frog.destroy(true);
 }
