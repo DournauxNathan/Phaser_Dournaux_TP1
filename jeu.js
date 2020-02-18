@@ -43,6 +43,7 @@ function preload() {
 	this.load.image('background','assets/back.png');	
 	this.load.spritesheet('rupee','assets/rupee.png', {frameWidth: 16, frameHeight: 16});
 	this.load.spritesheet('cherry','assets/cherry.png', {frameWidth: 16, frameHeight: 16});
+	this.load.spritesheet('choru','assets/chorus.png', {frameWidth: 16, frameHeight: 16});
 	this.load.image('sol','assets/platform.png');
 
 	
@@ -82,7 +83,7 @@ function create() {
 	player = this.physics.add.sprite(100,450,'idle').setScale(2);
 	player.setCollideWorldBounds(true);
 	this.physics.add.collider(player,platforms);
-		//Vie
+
 	vie3 = this.add.image(60,30,'3vie');
 	vie2 = this.add.image(60,30,'2vie');
 	vie1 = this.add.image(60,30,'1vie');
@@ -131,16 +132,20 @@ function create() {
 	this.physics.add.collider(rupees,platforms);
 	this.physics.add.overlap(player,rupees,collectRupee,null,this);
 
+		//Cherry
 	cherrys = this.physics.add.group({
 		key: 'cherry',
-		setXY: {x:700,y:500},
+		setXY: {x:550,y:500},
 		setScale: { x: 1.5, y: 1.5}
 	});
 
 	this.physics.add.collider(cherrys, platforms);
 	this.physics.add.overlap(player, cherrys, collectCherrys, null, this);
-
-	this.physics.add.overlap(frog, cherrys, ennemiCollect, null, this);
+		//Chorus
+	chorus = this.physics.add.group();
+	this.physics.add.collider(chorus, platforms);
+	this.physics.add.overlap(player, chorus, collectChorus, null, this);
+	
 
 	/*Texte*/
 		//Score
@@ -153,7 +158,7 @@ function create() {
 	newGameText = this.add.text(245, 150, 'Appuyer sur (Bas) pour rejouer', {  fontSize: '16px', fill: '#000' });
 	newGameText.visible = false
 
-	/*Ennemi*/
+	/*Ennemie*/
 		//Bombes
 	bombs = this.physics.add.group();
 	this.physics.add.collider(bombs, platforms, hitPlatforms, null, this);
@@ -163,6 +168,7 @@ function create() {
 	frog.setCollideWorldBounds(true);
 	this.physics.add.collider(frog,platforms);
 	this.physics.add.overlap(frog, player, hitEnnemi, null, this);
+	this.physics.add.overlap(frog, cherrys, ennemiCollect, null, this);
 	frog.visible = false;
 
 	this.anims.create({
@@ -271,28 +277,28 @@ function update() {
 	if (score >= 10) {
 		frog.visible = true;
 
-	  	if(ennemi.x >= player.x)
+	  	if(frog.x >= 700)
 		{
 			this.tweens.add({
-		        targets: ennemi,
+		        targets: frog,
 		        x: 0,
 		        duration: 5000,
 		        ease: 'Linear'
 			});
-			ennemi.play('frogJ', true);
-			ennemi.setFlipX(false);
+			frog.play('frogJ', true);
+			frog.setFlipX(false);
 		}
 
-		if(ennemi.x <= player.x)
+		if(frog.x <= 50)
 		{
 			this.tweens.add({
-		        targets: ennemi,
+		        targets: frog,
 		        x: 750,
 		        duration: 5000,
 		        ease: 'Linear'   
 			});
-			ennemi.play('frogJ', true);
-			ennemi.setFlipX(true);
+			frog.play('frogJ', true);
+			frog.setFlipX(true);
 		}
 	}
 
@@ -340,7 +346,7 @@ function collectCherrys(player, cherry) {
 		if (cherrys.countActive(true) === 0)
    		{
 	    	cherrys.children.iterate(function (child) {
-	            child.enableBody(true, child.x, 0, true, true);
+	            child.enableBody(true, child.x, child.y, true, true);
 	        });
 
 	    	var x = (player.x < 400) ? 
@@ -382,25 +388,33 @@ function collectCherrys(player, cherry) {
 	}
 }
 
-function hitEnnemi (frog, player)
-{
+function collectChorus(player, choru) {
+	choru.disableBody(true,true);
+	nVies--;
+	score -= 10;
+
+	scoreText.setText('' + score);
+}
+
+function hitEnnemi (frog, player) {
 	nVies = 0;
 }
 
-function ennemiCollect(frog, cherry)
-{
+function ennemiCollect(frog, cherry) {
 	cherry.disableBody(true,true);
 
 	if (cherrys.countActive(true) === 0)
-   		{
-	    	cherrys.children.iterate(function (child) {
-	            child.enableBody(true, child.x, 0, true, true);
-	        });
+   	{
+	    cherrys.children.iterate(function (child) {
 
-	        chorus.setXY(child.x, child.y);
-	    }
+	        child.enableBody(true, child.x, child.y, true, true);
+	        var choru = chorus.create(child.x, child.y, 'bomb');
+	    });
+
+        
+	    cherrys.setXY(Phaser.Math.Between(50, 750), Phaser.Math.Between(30, 500));
 	}
-
+}
 
 function hitPlatforms(bomb, platforms) {
 	speedBomb+= 10;
