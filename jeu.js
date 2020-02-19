@@ -25,8 +25,8 @@ var nVies = 3;
 var jump = 2;
 var nJump = 1;
 
-var groupeBullets;
-var coefDir;
+var bullets;
+var coefDir = 1;
 
 var cursors; 
 var rupees;
@@ -54,7 +54,7 @@ function preload() {
 	
 	this.load.spritesheet('bomb','assets/bomb.png',{frameWidth: 32, frameHeight: 32});
 
-	this.load.spritesheet('frog', 'assets/frog.png', {frameWidth: 35, frameHeight: 32});
+	this.load.spritesheet('ennemi1', 'assets/frog.png', {frameWidth: 35, frameHeight: 32});
 	this.load.spritesheet('frogJ', 'assets/frogJ.png', {frameWidth: 35, frameHeight: 32});
 
 	this.load.spritesheet('perso','assets/idle.png',{frameWidth: 32, frameHeight: 32});
@@ -71,8 +71,52 @@ function preload() {
 
 
 function create() {
+	/*Creation des projectiles*/
+	 var Bullet = new Phaser.Class({
+
+        Extends: Phaser.GameObjects.Image,
+
+        initialize:
+
+        function Bullet (scene)
+        {
+            Phaser.GameObjects.Image.call(this, scene, -100, 0, 'bullet');
+
+            this.speed = Phaser.Math.GetSpeed(600, 1);
+        },
+
+        fire: function (x, y)
+        {
+            this.setPosition(x, y);
+
+            this.setActive(true);
+            this.setVisible(true);
+        },
+
+        update: function (time, delta)
+        {
+            this.x += this.speed * delta;
+
+            if (this.x > 820)
+            {
+                this.setActive(false);
+                this.setVisible(false);
+            }
+        } 
+     });
+
+	    bullets = this.add.group({
+	        classType: Bullet,
+	        maxSize: 30,
+	        runChildUpdate: true
+	    });
+
 	/*Fond du jeu*/
 	this.add.image(400,300,'background');
+	this.add.image(1200,300,'background');
+	this.add.image(2000,300,'background');
+
+
 
 	/*Platformes*/
 	platforms = this.physics.add.staticGroup();
@@ -81,23 +125,48 @@ function create() {
 	platforms.create(330,580,'sol').setScale(0.75,0.5).refreshBody();
 	platforms.create(420,580,'sol').setScale(0.75,0.5).refreshBody();
 	platforms.create(600,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(700,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(750,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(850,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(950,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(1050,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(1150,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(1250,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(1350,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(1450,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(1550,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(1650,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(1750,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(1850,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(1950,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(2050,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(2150,580,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(2250,580,'sol').setScale(0.75,0.5).refreshBody();
+
+
 	platforms.create(690,370,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(850,370,'sol').setScale(0.75,0.5).refreshBody();
 	platforms.create(200,270,'sol').setScale(0.75,0.5).refreshBody();
 	
 	/*Joueur*/
+	
+
 	player = this.physics.add.sprite(100,450,'idle').setScale(2);
 	player.setCollideWorldBounds(true);
 	this.physics.add.collider(player,platforms);
+
+	
 
 	vie3 = this.add.image(60,30,'3vie');
 	vie2 = this.add.image(60,30,'2vie');
 	vie1 = this.add.image(60,30,'1vie');
 	vie0 = this.add.image(60,30,'0vie');
+
+ 	
+
 		//Projectiles
 	groupeBullets = this.physics.add.group();
-	this.physics.add.collider(groupeBullets,frog, hit, null,this);
-	//this.physics.add.overlap(bullet, frog, hit, null, this);
+	this.physics.add.overlap(groupeBullets,frog, hit, null,this);
+	this.physics.add.overlap(groupeBullets,platforms, deleteBullet, null,this);
         
 	
 		//Animation
@@ -122,7 +191,8 @@ function create() {
 	});
 		//
 	/*Creation des input directionnelles*/
-	cursors = this.input.keyboard.createCursorKeys(); 
+	cursors = this.input.keyboard.createCursorKeys();
+	fire = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
 	keys = this.input.keyboard.addKeys('X'); 
 	
 	/*Colllectible*/
@@ -175,11 +245,12 @@ function create() {
 	this.physics.add.collider(bombs, platforms, hitPlatforms, null, this);
 	this.physics.add.overlap(player, bombs, hitBomb, null, this);
 		//Frog
-	frog = this.physics.add.sprite(700,450,'frog').setScale(1.5);
+	frog = this.physics.add.sprite(700,450,'ennemi1').setScale(1.5);
 	frog.setCollideWorldBounds(true);
 	this.physics.add.collider(frog,platforms);
 	this.physics.add.overlap(frog, player, hitEnnemi, null, this);
 	this.physics.add.overlap(frog, cherrys, ennemiCollect, null, this);
+	this.physics.add.overlap(frog, groupeBullets, hit, null, this);
 	frog.visible = false;
 
 	this.anims.create({
@@ -240,21 +311,25 @@ function update() {
 		//Droite et gauche
 	if(cursors.left.isDown)
 	{
+		player.direction = 'left';
 		player.setVelocityX(-200);
 		player.anims.play('run', true);
 		player.setFlipX(true);
 
 		if (cursors.shift.isDown && player.body.touching.down) {
+			player.direction = 'left';
 			player.setVelocityX(-200*2);
 		}
 	}
 	else if(cursors.right.isDown)
 	{
+		player.direction = 'right';
 		player.setVelocityX(200);
 		player.anims.play('run', true);
 		player.setFlipX(false);
 
 		if (cursors.shift.isDown  && player.body.touching.down) {
+			player.direction = 'right';
 			player.setVelocityX(200*2);
 		}
 	}
@@ -264,22 +339,22 @@ function update() {
 		player.anims.play('idle', true);
 	} 
 
-	if (cursors.up.isDown) {
-	    if (player.direction == 'left') 
-	    { 
-	    	coefDir = 1; 
-	    } 
-	    /*if (player.direction == 'left')
-	    { 
-	    	coefDir = 1;
-	    }*/
+	if (Phaser.Input.Keyboard.JustDown(fire)) {
+		
+		if (player.direction == 'right') {
+			var coefDir = 1;
+		}
 
-        //Création de la balle
+		if (player.direction == 'left') {
+			var coefDir = -1;
+		}
+
+	    if (player.direction == 'left') { coefDir = -1; } else { coefDir = 1 }
+        // on crée la balle a coté du joueur
         var bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
-        //Parametres physiques de la balle
-        bullet.setCollideWorldBounds(true);
+        // parametres physiques de la balle.
         bullet.body.allowGravity =false;
-        bullet.setVelocity(1000 * coefDir, 0); 
+        bullet.setVelocity(1000 * coefDir, 0); // vitesse en x et en y
     }
 
 		
@@ -326,7 +401,7 @@ function update() {
 		        duration: 5000,
 		        ease: 'Linear'   
 			});
-			frog.play('frogJ', true);
+			frog.anims.play('frogJ', true);
 			frog.setFlipX(true);
 		}
 	}
@@ -351,6 +426,8 @@ function collectRupee(player, rupee) {
         rupees.children.iterate(function (child) {
             child.enableBody(true, child.x, 0, true, true);
         });
+
+
 
         var x = (player.x < 400) ? 
         	Phaser.Math.Between(400, 800) : 
@@ -418,7 +495,7 @@ function collectCherrys(player, cherry) {
 }
 
 function collectChorus(player, choru) {
-	choru.disableBody(true,true);
+	choru.disableBody(true, true);
 	nVies--;
 	score -= 10;
 
@@ -430,14 +507,14 @@ function hitEnnemi (frog, player) {
 }
 
 function ennemiCollect(frog, cherry) {
-	cherry.disableBody(true,true);
+	cherry.disableBody(true, true);
 
 	if (cherrys.countActive(true) === 0)
    	{
 	    cherrys.children.iterate(function (child) {
 
 	        child.enableBody(true, child.x, child.y, true, true);
-	        var choru = chorus.create(child.x, child.y, 'bomb');
+	        var choru = chorus.create(child.x, child.y, 'choru');
 	    });
 
         
@@ -457,6 +534,13 @@ function hitPlatforms(bomb, platforms) {
 	}
 }
 
-function hit (groupeBullets, frog) {
-	frog.destroy(true);
+function hit (ennemi1, groupeBullets) {
+	//ennemi1.disableBody(true, true);
+	frog.disableBody(true);
+	frog.setAlpha(0);
+	groupeBullets.destroy(true);
+}
+
+function deleteBullet(groupeBullets, platforms) {
+	groupeBullets.destroy(true);
 }
