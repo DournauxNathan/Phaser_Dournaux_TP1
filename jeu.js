@@ -116,7 +116,8 @@ function create() {
 	this.add.image(1200,300,'background');
 	this.add.image(2000,300,'background');
 
-
+	/*Porte*/
+	this.add.image(2250,500,'porte');
 
 	/*Platformes*/
 	platforms = this.physics.add.staticGroup();
@@ -148,13 +149,14 @@ function create() {
 	platforms.create(200,270,'sol').setScale(0.75,0.5).refreshBody();
 	
 	/*Joueur*/
-	
+	this.cameras.main.setBounds(0, 0, 1200 * 2, 300 * 2);
+    this.physics.world.setBounds(0, 0, 1200 * 2, 300*2);
 
 	player = this.physics.add.sprite(100,450,'idle').setScale(2);
 	player.setCollideWorldBounds(true);
 	this.physics.add.collider(player,platforms);
 
-	
+	this.cameras.main.startFollow(player, true, 0.05, 0.05);
 
 	vie3 = this.add.image(60,30,'3vie');
 	vie2 = this.add.image(60,30,'2vie');
@@ -212,6 +214,7 @@ function create() {
 	})
 	this.physics.add.collider(rupees,platforms);
 	this.physics.add.overlap(player,rupees,collectRupee,null,this);
+	this.startFollow(player, true, 0.05, 0.05);
 
 		//Cherry
 	cherrys = this.physics.add.group({
