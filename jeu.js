@@ -267,7 +267,7 @@ function update() {
 			var moveText = this.add.text(100, 430,'<- Move ->');
 
 		}
-		
+		 
 		if (player.x >= 300) 
 		{
 			var moveText = this.add.text(350, 410,' Run\nSHIFT');
@@ -599,8 +599,8 @@ function deleteBullet(groupeBullets, platforms) {
 	groupeBullets.destroy(true);
 }
 
-function fadeLevel(player, porte)
-{
+function fadeLevel(player, porte) {
+	/*Affaiblissement de l'écran - début de la transition vers la scene suivante*/
 	this.cameras.main.fade(0xf0f, 4000);
 	timedEvent = this.time.delayedCall(5000, changeLevel, [], this);
 }
