@@ -40,14 +40,15 @@ var newGameText
 var bomb;
 var speedBomb = 1;
 var frog;
-var vieFrog = 1;
+var frog2;
+
 
 
 
 function preload() {
 	this.load.image('background','assets/back.png');	
 	this.load.spritesheet('rupee','assets/rupee.png', {frameWidth: 16, frameHeight: 16});
-	this.load.spritesheet('cherry','assets/cherry.png', {frameWidth: 16, frameHeight: 16});
+	this.load.spritesheet('cherry','assets/cherry.png', {frameWidth: 16, frameHeight: 20});
 	this.load.spritesheet('choru','assets/chorus.png', {frameWidth: 16, frameHeight: 16});
 	this.load.image('sol','assets/platform.png');
 
@@ -65,7 +66,6 @@ function preload() {
 	this.load.image('3vie', 'assets/vie/3vie.png');
 	this.load.image('2vie', 'assets/vie/2vie.png');
 	this.load.image('1vie', 'assets/vie/1vie.png');
-	this.load.image('0vie', 'assets/vie/0vie.png');
 }
 
 
@@ -117,57 +117,35 @@ function create() {
 	this.add.image(2000,300,'background');
 
 	/*Porte*/
-	this.add.image(2250,500,'porte');
+	portes = this.physics.add.staticGroup();
+	portes.create(2250,500,'porte').refreshBody();
 
 	/*Platformes*/
 	platforms = this.physics.add.staticGroup();
-	platforms.create(50,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(160,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(330,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(420,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(600,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(750,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(850,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(950,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(1050,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(1150,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(1250,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(1350,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(1450,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(1550,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(1650,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(1750,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(1850,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(1950,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(2050,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(2150,580,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(2250,580,'sol').setScale(0.75,0.5).refreshBody();
-
-
-	platforms.create(690,370,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(850,370,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(200,270,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(50,580,'sol').setScale(30,0.5).refreshBody();
+	platforms.create(1500,420,'sol').setScale(0.75,0.5).refreshBody();
+	platforms.create(1000,200,'sol').setScale(0.75,0.5).refreshBody();
 	
 	/*Joueur*/
 	this.cameras.main.setBounds(0, 0, 1200 * 2, 300 * 2);
     this.physics.world.setBounds(0, 0, 1200 * 2, 300*2);
 
-	player = this.physics.add.sprite(100,450,'idle').setScale(2);
+	player = this.physics.add.sprite(100,450,'idle').setScale(2).setSize(25,32,false);;
 	player.setCollideWorldBounds(true);
+	player.setGravityY(150);
 	this.physics.add.collider(player,platforms);
+	this.physics.add.collider(player,portes, fadeLevel, null, this);
 
-	this.cameras.main.startFollow(player, true, 0.05, 0.05);
+	this.cameras.main.startFollow(player , true, 0.05, 0.05);
 
-	vie3 = this.add.image(60,30,'3vie');
-	vie2 = this.add.image(60,30,'2vie');
-	vie1 = this.add.image(60,30,'1vie');
-	vie0 = this.add.image(60,30,'0vie');
-
- 	
+	vie3 = this.add.image(60,30,'3vie').setScrollFactor(0);
+	vie2 = this.add.image(60,30,'2vie').setScrollFactor(0);
+	vie1 = this.add.image(60,30,'1vie').setScrollFactor(0);
 
 		//Projectiles
 	groupeBullets = this.physics.add.group();
 	this.physics.add.overlap(groupeBullets,frog, hit, null,this);
+	this.physics.add.overlap(groupeBullets,frog2, hit, null,this);
 	this.physics.add.overlap(groupeBullets,platforms, deleteBullet, null,this);
         
 	
@@ -201,8 +179,8 @@ function create() {
 		//Rupees
 	rupees = this.physics.add.group({
 		key: 'rupee',
-		repeat: 4,
-		setXY: {x:50,y:0,stepX:150},
+		repeat: 2,
+		setXY: {x:920,y:150,stepX:80},
 		setScale: { x: 1.5, y: 1.5}
 	});
 
@@ -214,12 +192,11 @@ function create() {
 	})
 	this.physics.add.collider(rupees,platforms);
 	this.physics.add.overlap(player,rupees,collectRupee,null,this);
-	this.startFollow(player, true, 0.05, 0.05);
 
 		//Cherry
 	cherrys = this.physics.add.group({
 		key: 'cherry',
-		setXY: {x:550,y:500},
+		setXY: {x:1500,y:300},
 		setScale: { x: 1.5, y: 1.5}
 	});
 
@@ -233,14 +210,14 @@ function create() {
 
 	/*Texte*/
 		//Score
-	this.add.image(770,30,'rupee');
-	scoreText = this.add.text(680, 16, '0 ', { fontSize: '32px', fill: '#000' });
+	this.add.image(player.x+650,30,'rupee').setScale(1.5).setScrollFactor(0);
+	scoreText = this.add.text(680, 16, '0 ', { fontSize: '32px', fill: '#000' }).setScrollFactor(0);
 		//GameOver
-	gameOverText = this.add.text(310, 100, 'GAME OVER', {fontSize: '32px', fill: '#000' });
-	gameOverText.visible = false
+	gameOverText = this.add.text(310, 100, 'GAME OVER', {fontSize: '32px', fill: '#000' }).setScrollFactor(0);
+	gameOverText.visible = false;
 		//Nouvelle partie
-	newGameText = this.add.text(245, 150, 'Appuyer sur (Bas) pour rejouer', {  fontSize: '16px', fill: '#000' });
-	newGameText.visible = false
+	newGameText = this.add.text(245, 150, 'Appuyer sur (X) pour rejouer', {  fontSize: '16px', fill: '#000' }).setScrollFactor(0);
+	newGameText.visible = false;
 
 	/*Ennemie*/
 		//Bombes
@@ -248,13 +225,20 @@ function create() {
 	this.physics.add.collider(bombs, platforms, hitPlatforms, null, this);
 	this.physics.add.overlap(player, bombs, hitBomb, null, this);
 		//Frog
-	frog = this.physics.add.sprite(700,450,'ennemi1').setScale(1.5);
+	frog = this.physics.add.sprite(1360,450,'ennemi1').setScale(1.5);
 	frog.setCollideWorldBounds(true);
 	this.physics.add.collider(frog,platforms);
 	this.physics.add.overlap(frog, player, hitEnnemi, null, this);
 	this.physics.add.overlap(frog, cherrys, ennemiCollect, null, this);
 	this.physics.add.overlap(frog, groupeBullets, hit, null, this);
-	frog.visible = false;
+
+	frog2 = this.physics.add.sprite(2050,450,'ennemi1').setScale(1.5);
+	frog2.setCollideWorldBounds(true);
+	this.physics.add.collider(frog2,platforms);
+	this.physics.add.overlap(frog2, player, hitEnnemi, null, this);
+	this.physics.add.overlap(frog2, cherrys, ennemiCollect, null, this);
+	this.physics.add.overlap(frog2, groupeBullets, hit2, null, this);
+	
 
 	this.anims.create({
 		key:'frog',
@@ -269,98 +253,133 @@ function create() {
 		frameRate: 5,
 		repeat: -1
 	});
+
+	
 }
 
 
 function update() {
+
+	/*Tutoriel*/
+		//Droite et gauche
+		if (player.x >= 100) 
+		{
+			var moveText = this.add.text(100, 430,'<- Move ->');
+
+		}
+		
+		if (player.x >= 300) 
+		{
+			var moveText = this.add.text(350, 410,' Run\nSHIFT');
+		}
+
+		if (player.x >= 550) 
+		{
+			var moveText = this.add.text(600, 410,' Fire\n  F');
+		}
+
+		if (player.x >= 1200) 
+		{
+			var moveText = this.add.text(1300, 410,' Jump\nSPACE');
+		}
+
+		if (player.y < 350) 
+		{
+			var moveText = this.add.text(1140, 120,'Double Jump\n  SPACE x2');
+		}
+
 	/*Reset le jeu*/
-	if(keys.X.isDown) 
-	{  
-		score = 0;
-		nVies = 3
-		this.registry.destroy();
-		this.events.off();
-		this.scene.restart();
-	}
+		if(keys.X.isDown) 
+		{  
+			score = 0;
+			nVies = 3;
+			jump = 2;	
+			nJump = 1;
+			speedBomb = 1;
+			this.tweens.destroy();
+			this.registry.destroy();
+			this.events.off();
+			this.scene.restart();
+		}
 
 	/*Déplacement*/
 		//Saut
-	if (player.body.touching.down && cursors.space.isDown)
-	{
-		jump = 2;
-	}
-
-	if (cursors.space.isUp){
-		nJump = 1;
-	}
-
-	if (nJump == 1 && jump > 0 && cursors.space.isDown)
-	{
-		jump--;
-		nJump = 0;
-		if (jump == 1) 
-		{	
-			player.anims.play('jump', true);
-			player.setVelocityY(-300);
-		}
-
-		if (jump == 0) 
+		if (player.body.touching.down && cursors.space.isDown)
 		{
-			player.setVelocityY(-250);
-			player.anims.play('jump', true);
+			jump = 2;
 		}
-	}
+
+		if (cursors.space.isUp){
+			nJump = 1;
+		}
+
+		if (nJump == 1 && jump > 0 && cursors.space.isDown)
+		{
+			jump--;
+			nJump = 0;
+			if (jump == 1) 
+			{	
+				player.anims.play('jump', true);
+				player.setVelocityY(-390);
+			}
+
+			if (jump == 0) 
+			{
+				player.setVelocityY(-260);
+				player.anims.play('jump', true);
+			}
+		}
 
 		//Droite et gauche
-	if(cursors.left.isDown)
-	{
-		player.direction = 'left';
-		player.setVelocityX(-200);
-		player.anims.play('run', true);
-		player.setFlipX(true);
-
-		if (cursors.shift.isDown && player.body.touching.down) {
+		if(cursors.left.isDown)
+		{
 			player.direction = 'left';
-			player.setVelocityX(-200*2);
-		}
-	}
-	else if(cursors.right.isDown)
-	{
-		player.direction = 'right';
-		player.setVelocityX(200);
-		player.anims.play('run', true);
-		player.setFlipX(false);
+			player.setVelocityX(-200);
+			player.anims.play('run', true);
+			player.setFlipX(true);
 
-		if (cursors.shift.isDown  && player.body.touching.down) {
+			if (cursors.shift.isDown && player.body.touching.down) {
+				player.direction = 'left';
+				player.setVelocityX(-200*2);
+			}
+		}
+		else if(cursors.right.isDown)
+		{
 			player.direction = 'right';
-			player.setVelocityX(200*2);
+			player.setVelocityX(200);
+			player.anims.play('run', true);
+			player.setFlipX(false);
+
+			if (cursors.shift.isDown  && player.body.touching.down) {
+				player.direction = 'right';
+				player.setVelocityX(200*2);
+			}
 		}
-	}
-	else
-	{
-		player.setVelocityX(0);
-		player.anims.play('idle', true);
-	} 
+		else
+		{
+			player.setVelocityX(0);
+			player.anims.play('idle', true);
+		} 
 
-	if (Phaser.Input.Keyboard.JustDown(fire)) {
-		
-		if (player.direction == 'right') {
-			var coefDir = 1;
-		}
+		if (Phaser.Input.Keyboard.JustDown(fire)) {
+			
+			if (player.direction == 'right') {
+				var coefDir = 1;
+			}
 
-		if (player.direction == 'left') {
-			var coefDir = -1;
-		}
+			if (player.direction == 'left') {
+				var coefDir = -1;
+			}
 
-	    if (player.direction == 'left') { coefDir = -1; } else { coefDir = 1 }
-        // on crée la balle a coté du joueur
-        var bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
-        // parametres physiques de la balle.
-        bullet.body.allowGravity =false;
-        bullet.setVelocity(1000 * coefDir, 0); // vitesse en x et en y
-    }
+		    if (player.direction == 'left') { coefDir = -1; } else { coefDir = 1 }
+	        // on crée la balle a coté du joueur
+	        var bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
+	        // parametres physiques de la balle.
+	        bullet.body.allowGravity =false;
+	        bullet.setVelocity(1000 * coefDir, 0); 
+	    }
 
-		
+	/*Actualisation de la vie*/
 	if(nVies == 2)
 	{
 		vie3.destroy(true);
@@ -378,17 +397,20 @@ function update() {
 	   	gameOverText.visible = true;
 	   	newGameText.visible = true;
 	   	gameOver = true;
+	   	this.cameras.main.fade(0xfff, 4000);
+
+	   	this.registry.destroy();
+		this.events.off();
+		this.scene.restart();
 	}
 	
 	/*Apparition d'un frog*/
-	if (score >= 10) {
-		frog.visible = true;
-
-	  	if(frog.x >= 700)
+		//Frog1
+	  	if(frog.x >= 1360)
 		{
 			this.tweens.add({
 		        targets: frog,
-		        x: 0,
+		        x: 850,
 		        duration: 5000,
 		        ease: 'Linear'
 			});
@@ -396,19 +418,41 @@ function update() {
 			frog.setFlipX(false);
 		}
 
-		if(frog.x <= 50)
+		if(frog.x <= 850)
 		{
 			this.tweens.add({
 		        targets: frog,
-		        x: 750,
+		        x: 1360,
 		        duration: 5000,
 		        ease: 'Linear'   
 			});
 			frog.anims.play('frogJ', true);
 			frog.setFlipX(true);
 		}
-	}
+		//Frog2
+		if(frog2.x >= 2050)
+		{
+			this.tweens.add({
+		        targets: frog2,
+		        x: 1800,
+		        duration: 5000,
+		        ease: 'Linear'
+			});
+			frog2.play('frogJ', true);
+			frog2.setFlipX(false);
+		}
 
+		if(frog2.x <= 1800)
+		{
+			this.tweens.add({
+		        targets: frog2,
+		        x: 2050,
+		        duration: 5000,
+		        ease: 'Linear'   
+			});
+			frog2.anims.play('frogJ', true);
+			frog2.setFlipX(true);
+		}
 }
 
 function hitBomb(player, bomb) {
@@ -458,11 +502,11 @@ function collectCherrys(player, cherry) {
 	            child.enableBody(true, child.x, child.y, true, true);
 	        });
 
-	    	var x = (player.x < 400) ? 
-        	Phaser.Math.Between(400, 800) : 
-        	Phaser.Math.Between(0, 400);
+	    	var x = (player.x < 800 || player.x >100) ? 
+        	Phaser.Math.Between(1000, 2000) : 
+        	Phaser.Math.Between(0, 100);
 
-	        cherrys.setXY(Phaser.Math.Between(50, 750), Phaser.Math.Between(30, 500));
+	        cherrys.setXY(Phaser.Math.Between(x, x), Phaser.Math.Between(30, 500));
 		}
 	}
 
@@ -537,13 +581,31 @@ function hitPlatforms(bomb, platforms) {
 	}
 }
 
-function hit (ennemi1, groupeBullets) {
+function hit(ennemi1, groupeBullets) {
 	//ennemi1.disableBody(true, true);
 	frog.disableBody(true);
 	frog.setAlpha(0);
 	groupeBullets.destroy(true);
 }
 
+function hit2(ennemi1, groupeBullets) {
+	//ennemi1.disableBody(true, true);
+	frog2.disableBody(true);
+	frog2.setAlpha(0);
+	groupeBullets.destroy(true);
+}
+
 function deleteBullet(groupeBullets, platforms) {
 	groupeBullets.destroy(true);
+}
+
+function fadeLevel(player, porte)
+{
+	this.cameras.main.fade(0xf0f, 4000);
+	timedEvent = this.time.delayedCall(5000, changeLevel, [], this);
+}
+
+function changeLevel() {
+	console.log("Changement de scene");
+	this.scene.start('Level_1');
 }
