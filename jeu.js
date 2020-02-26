@@ -6,7 +6,7 @@ physics: {
         default: 'arcade',
         arcade: {
             gravity: { y: 300 },
-            debug: true
+            debug: false
         }
     },
 scene: {
@@ -68,8 +68,6 @@ function preload() {
 	this.load.image('1vie', 'assets/vie/1vie.png');
 }
 
-
-
 function create() {
 	/*Creation des projectiles*/
 	 var Bullet = new Phaser.Class({
@@ -112,19 +110,31 @@ function create() {
 	    });
 
 	/*Fond du jeu*/
-	this.add.image(400,300,'background');
-	this.add.image(1200,300,'background');
-	this.add.image(2000,300,'background');
+		this.add.image(400,300,'background');
+		this.add.image(1200,300,'background');
+		this.add.image(2000,300,'background');
 
 	/*Porte*/
-	portes = this.physics.add.staticGroup();
-	portes.create(2250,500,'porte').refreshBody();
+		portes = this.physics.add.staticGroup();
+		portes.create(2250,500,'porte').refreshBody();
 
 	/*Platformes*/
-	platforms = this.physics.add.staticGroup();
-	platforms.create(50,580,'sol').setScale(30,0.5).refreshBody();
-	platforms.create(1500,420,'sol').setScale(0.75,0.5).refreshBody();
-	platforms.create(1000,200,'sol').setScale(0.75,0.5).refreshBody();
+		platforms = this.physics.add.staticGroup();
+		platforms.create(50,580,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(268,580,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(486,580,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(704,580,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(922,580,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(1140,580,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(1358,580,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(1576,580,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(1794,580,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(2012,580,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(2230,580,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(2448,580,'sol').setScale(0.75,0.5).refreshBody();
+
+		platforms.create(1500,420,'sol').setScale(0.75,0.5).refreshBody();
+		platforms.create(1000,200,'sol').setScale(0.75,0.5).refreshBody();
 	
 	/*Joueur*/
 	this.cameras.main.setBounds(0, 0, 1200 * 2, 300 * 2);
@@ -291,16 +301,17 @@ function update() {
 	/*Reset le jeu*/
 		if(keys.X.isDown) 
 		{  
+			this.registry.destroy();
+			this.events.off();
+			this.scene.restart();
+		
 			score = 0;
 			nVies = 3;
 			jump = 2;	
 			nJump = 1;
 			speedBomb = 1;
-			this.tweens.destroy();
-			this.registry.destroy();
-			this.events.off();
-			this.scene.restart();
-		}
+			//this.tweens.destroy();
+		}	
 
 	/*Déplacement*/
 		//Saut
