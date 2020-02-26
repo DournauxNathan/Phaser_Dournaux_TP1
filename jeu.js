@@ -226,7 +226,7 @@ function create() {
 	gameOverText = this.add.text(310, 100, 'GAME OVER', {fontSize: '32px', fill: '#000' }).setScrollFactor(0);
 	gameOverText.visible = false;
 		//Nouvelle partie
-	newGameText = this.add.text(245, 150, 'Appuyer sur (X) pour rejouer', {  fontSize: '16px', fill: '#000' }).setScrollFactor(0);
+	newGameText = this.add.text(245, 150, 'Appuyer sur (F5) pour rejouer', {  fontSize: '16px', fill: '#000' }).setScrollFactor(0);
 	newGameText.visible = false;
 
 	/*Ennemie*/
